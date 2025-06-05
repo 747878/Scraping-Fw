@@ -1,23 +1,31 @@
 name: IG Discovery
+
 on:
-  schedule:     # ogni 6 h
-    - cron: '0 */6 * * *'
+  schedule:
+    - cron: '0 */6 * * *'      # ogni 6 h
   workflow_dispatch:
+
 jobs:
   scrape:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: pip install -r requirements.txt
-      - run: |
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Instaloader
+        run: |
           instaloader \
-            --login ${{ secrets.IG_USER }} \
-            --password ${{ secrets.IG_PASS }} \
+            --login "${{ secrets.IG_USER }}" \
+            --password "${{ secrets.IG_PASS }}" \
             --no-pictures --no-videos --quiet \
-            --hashtag yogapadova --count 40 \
+            --count 40 \
             --post-metadata-txt='{json}' \
-            --filename-pattern='posts.json'
+            --filename-pattern='posts.json' \
+            "#yogapadova"
+
       - name: Push to Make webhook
         run: |
           curl -X POST -H "Content-Type: application/json" \
-               --data @posts.json https://hook.eu2.make.com/6qs3wh0u9oyhdqm1hr7zbwbtntn61krp
+               --data @posts.json https://hook.eu2.make.com/6qs3wh0u9oyhdqm1h7zbwbtnn61krp
