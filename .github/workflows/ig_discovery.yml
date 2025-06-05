@@ -2,7 +2,7 @@ name: IG Discovery
 
 on:
   schedule:
-    - cron: '0 */6 * * *'      # ogni 6 h
+    - cron: '0 */6 * * *'        # ogni 6 h
   workflow_dispatch:
 
 jobs:
@@ -14,11 +14,14 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Decode session file
+        run: |
+          echo "${{ secrets.IG_SESSION_B64 }}" | base64 -d > session-ig
+
       - name: Run Instaloader
         run: |
           instaloader \
-            --login "${{ secrets.IG_USER }}" \
-            --password "${{ secrets.IG_PASS }}" \
+            --sessionfile session-ig \
             --no-pictures --no-videos --quiet \
             --count 40 \
             --post-metadata-txt='{json}' \
