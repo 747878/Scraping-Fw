@@ -3,24 +3,30 @@ name: IG Discovery
 on:
   schedule:
     - cron: '0 */6 * * *'        # ogni 6 h
-  workflow_dispatch:
+  workflow_dispatch:             # pulsante “Run workflow” manuale
 
 jobs:
   scrape:
     runs-on: ubuntu-latest
+
     steps:
+      # 1️⃣ clona il repo
       - uses: actions/checkout@v4
 
+      # 2️⃣ installa le dipendenze Python elencate in requirements.txt
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      # 3️⃣ ricostruisce il file-cookie a partire dal secret Base-64
       - name: Decode session file
         run: |
-          echo "${{ secrets.IG_SESSION_B64 }}" | base64 -d > session-ig
+          printf '%s' "${{ secrets.IG_SESSION_B64 }}" | base64 -d > session-ig
 
+      # 4️⃣ esegue Instaloader con il cookie e scarica 40 post dell’hashtag
       - name: Run Instaloader
         run: |
           instaloader \
+            --login andrei_ovidiu_pasca \
             --sessionfile session-ig \
             --no-pictures --no-videos --quiet \
             --count 40 \
@@ -28,7 +34,9 @@ jobs:
             --filename-pattern='posts.json' \
             "#yogapadova"
 
+      # 5️⃣ invia il JSON al webhook di Make
       - name: Push to Make webhook
         run: |
           curl -X POST -H "Content-Type: application/json" \
-               --data @posts.json https://hook.eu2.make.com/6qs3wh0u9oyhdqm1h7zbwbtnn61krp
+               --data @posts.json \
+               https://hook.eu2.make.com/6qs3wh0u9oyhdqm1h7zbwbtnn61krp
