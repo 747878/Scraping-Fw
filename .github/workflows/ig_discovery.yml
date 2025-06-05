@@ -20,4 +20,4 @@ jobs:
       - name: Push to Make webhook
         run: |
           curl -X POST -H "Content-Type: application/json" \
-               --data @posts.json https://hook.integromat.com/XYZ123
+               --data @posts.json https://hook.eu2.make.com/6qs3wh0u9oyhdqm1hr7zbwbtntn61krp
