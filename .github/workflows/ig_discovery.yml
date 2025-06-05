@@ -1,0 +1,23 @@
+name: IG Discovery
+on:
+  schedule:     # ogni 6 h
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install -r requirements.txt
+      - run: |
+          instaloader \
+            --login ${{ secrets.IG_USER }} \
+            --password ${{ secrets.IG_PASS }} \
+            --no-pictures --no-videos --quiet \
+            --hashtag yogapadova --count 40 \
+            --post-metadata-txt='{json}' \
+            --filename-pattern='posts.json'
+      - name: Push to Make webhook
+        run: |
+          curl -X POST -H "Content-Type: application/json" \
+               --data @posts.json https://hook.integromat.com/XYZ123
