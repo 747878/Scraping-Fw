@@ -24,7 +24,7 @@ jobs:
             --login andrei_ovidiu_pasca \
             --sessionfile session-ig \
             --no-pictures --no-videos --quiet \
-            --count 40 \
+            --count 5 \
             --post-metadata-txt='{json}' \
             --filename-pattern='posts.json' \
             "#yogapadova"
